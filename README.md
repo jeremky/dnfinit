@@ -1,4 +1,4 @@
-# dnfinstall
+# dnfinit
 
 Script automatisant l'installation et le paramétrage de Fedora.
 
@@ -30,7 +30,7 @@ Le fichier `config/config.cfg` permet de paramétrer l'exécution du script selo
 Commentez les fonctions que vous ne voulez pas utiliser. Exemple :
 
 ```txt
-# dnfinstall config
+# dnfinit config
 
 install_packages
 enable_flathub
@@ -45,7 +45,7 @@ Avec le fichier de config se trouve `config/packages.cfg`, contenant la liste de
 Exemple :
 
 ```txt
-# dnfinstall packages list
+# dnfinit packages list
 
 colordiff
 curl
@@ -76,5 +76,5 @@ zoxide
 Une fois le fichier `config/config.cfg` modifié, lancez le script avec les droits root :
 
 ```bash
-sudo ./dnfinstall.sh
+sudo ./dnfinit.sh
 ```
