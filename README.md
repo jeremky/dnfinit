@@ -12,7 +12,6 @@ A script that automates installing and configuring Fedora.
 
 - `disable_sudopasswd`: disables the password prompt for sudo commands. **DO NOT USE IN PRODUCTION!**
 
-
 - `configure_sshd`: creates an `sshd` file (`/etc/ssh/sshd_config.d/<user>.conf`) with the following:
   - Restricts access to the main user (UID 1000)
   - Disables X11 forwarding

@@ -32,7 +32,7 @@ install_packages() {
 }
 
 enable_flathub() {
-  warning "Enabling Flathub..."
+  warning "Enabling Flathub"
   flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo || {
     error "Error while enabling Flathub"
   }
@@ -41,7 +41,7 @@ enable_flathub() {
 }
 
 disable_tty1() {
-  warning "Disabling tty1..."
+  warning "Disabling tty1"
   systemctl disable getty@tty1 || {
     error "Error while disabling tty1"
   }
@@ -50,7 +50,7 @@ disable_tty1() {
 }
 
 disable_sudopasswd() {
-  warning "Disabling password for sudo users..."
+  warning "Disabling the sudo password prompt"
   echo "%wheel ALL=(ALL) NOPASSWD: ALL" >/etc/sudoers.d/010_nopasswd || {
     error "Error while configuring sudo"
   }
