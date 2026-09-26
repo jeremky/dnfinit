@@ -1,72 +1,72 @@
 #!/bin/bash
 
-# Messages en couleur
+# Colored messages
 error() { echo -e "\033[0;31m❯ $*\033[0m"; }
 message() { echo -e "\033[0;36m──────────\033[0m\n\033[0;32m❱ $*\033[0m"; }
 warning() { echo -e "\033[0;33m❱ $*\033[0m\n\033[0;36m──────────\033[0m"; }
 
-# Vérification de l'OS :
+# Check OS
 if ! command -v dnf >/dev/null; then
-  error "Ce script nécessite dnf (Fedora)"
+  error "This script requires dnf (Fedora)"
   exit 1
 fi
 
-# Vérification des droits root
+# Check root privileges
 if [[ "$EUID" -ne 0 ]]; then
-  error "Droits root nécessaires"
+  error "Root privileges required"
   exit 1
 fi
 
-# Fonctions
+# Functions
 install_packages() {
-  warning "Mise à jour des paquets"
-  dnf -y upgrade || { error "Problème lors de la mise à jour des paquets"; }
+  warning "Updating packages"
+  dnf -y upgrade || { error "Error while updating packages"; }
   if [[ -f "$list" ]]; then
-    warning "Installation des paquets"
+    warning "Installing packages"
     grep -v -e '#' -e '^$' "$list" | xargs dnf -y install || {
-      error "Problème lors de l'installation des paquets"
+      error "Error while installing packages"
     }
-    message "Installation des paquets terminée"
+    message "Package installation complete"
     echo
   fi
 }
 
 enable_flathub() {
-  warning "Activation de Flathub..."
+  warning "Enabling Flathub..."
   flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo || {
-    error "Problème lors de l'activation de Flathub"
+    error "Error while enabling Flathub"
   }
-  message "Flathub activé"
+  message "Flathub enabled"
   echo
 }
 
 disable_tty1() {
-  warning "Désactivation du tty1..."
+  warning "Disabling tty1..."
   systemctl disable getty@tty1 || {
-    error "Problème lors de la désactivation du tty1"
+    error "Error while disabling tty1"
   }
-  message "tty1 désactivé"
+  message "tty1 disabled"
   echo
 }
 
 disable_sudopasswd() {
-  warning "Désactivation du mot de passe pour les utilisateurs sudo..."
+  warning "Disabling password for sudo users..."
   echo "%wheel ALL=(ALL) NOPASSWD: ALL" >/etc/sudoers.d/010_nopasswd || {
-    error "Problème lors de la configuration de sudo"
+    error "Error while configuring sudo"
   }
   chmod 440 /etc/sudoers.d/010_nopasswd || {
-    error "Problème lors de la configuration des permissions sudo"
+    error "Error while setting sudo permissions"
   }
-  message "Mot de passe sudo désactivé"
+  message "sudo password disabled"
   echo
 }
 
 configure_sshd() {
   if [[ ! -d /etc/ssh/sshd_config.d ]]; then
-    error "SSH n'est pas installé"
+    error "SSH is not installed"
     return 1
   fi
-  warning "Sécurisation de SSH"
+  warning "Securing SSH"
   user=$(id -un 1000)
   tee "/etc/ssh/sshd_config.d/$user.conf" <<EOF
 # Secure Config
@@ -83,19 +83,19 @@ MACs hmac-sha2-512-etm@openssh.com,hmac-sha2-256-etm@openssh.com
 Ciphers aes256-gcm@openssh.com,aes256-ctr,aes192-ctr,aes128-gcm@openssh.com,aes128-ctr
 EOF
   systemctl restart sshd || {
-    error "Problème lors du redémarrage de SSH"
+    error "Error while restarting SSH"
     exit 1
   }
-  message "SSH sécurisé. Modifiez le fichier /etc/ssh/sshd_config.d/$user.conf pour désactiver la connexion par mot de passe après avoir importé votre clé ed25519"
+  message "SSH secured. Edit /etc/ssh/sshd_config.d/$user.conf to disable password login after importing your ed25519 key"
   echo
 }
 
-# Exécution
+# Execution
 dir="$(dirname "$0")/config"
 cfg="$dir/config.cfg"
 list="$dir/packages.cfg"
 if [[ ! -f "$cfg" ]] || [[ ! -f "$list" ]]; then
-  error "Fichier $cfg ou $list introuvable"
+  error "File $cfg or $list not found"
   exit 1
 fi
 echo
@@ -104,7 +104,7 @@ while read -r line; do
   if declare -f "$line" >/dev/null; then
     "$line"
   else
-    error "Aucune fonction ne correspond au paramètre $line"
+    error "No function matches parameter $line"
     exit 1
   fi
 done <"$cfg"
